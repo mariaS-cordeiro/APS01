@@ -3,9 +3,24 @@ import pandas as pd
 
 st.set_page_config(page_title="APS - Ciência e Fake News", layout="centered")
 
-# ---------- FUNÇÃO ----------
+# ---------- FUNÇÕES ----------
 def contar_palavras(texto):
     return len(texto.split()) if texto and texto.strip() else 0
+
+def resumir_texto(texto, limite=80):
+    if isinstance(texto, str) and len(texto) > limite:
+        return texto[:limite] + "..."
+    return texto
+
+# ---------- ESTADO ----------
+if "respondido" not in st.session_state:
+    st.session_state["respondido"] = False
+
+if "df_respostas" not in st.session_state:
+    st.session_state["df_respostas"] = None
+
+if "txt_respostas" not in st.session_state:
+    st.session_state["txt_respostas"] = ""
 
 # ---------- CABEÇALHO ----------
 st.markdown(
@@ -23,7 +38,7 @@ st.markdown(
 st.divider()
 
 # ---------- IDENTIFICAÇÃO ----------
-nome_aluno = st.text_input("Nome dos(a) alunos(a):")
+nome_aluno = st.text_input("Nome do(a) aluno(a):")
 
 st.divider()
 
@@ -95,10 +110,35 @@ if st.button("Salvar respostas"):
     dados = {
         "Aluno(a)": [nome_aluno] * 8,
         "Questão": ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Texto final"],
-        "Resposta": respostas + [texto_final]
+        "Resposta completa": respostas + [texto_final]
     }
 
     df = pd.DataFrame(dados)
+    df["Resposta"] = df["Resposta completa"].apply(lambda x: resumir_texto(x, 80))
 
-    st.success("Respostas registradas!")
-    st.dataframe(df, use_container_width=True)
+    # conteúdo para download em txt
+    conteudo_txt = f"Aluno(a): {nome_aluno}\n\n"
+    for i, r in enumerate(respostas, start=1):
+        conteudo_txt += f"Q{i}:\n{r}\n\n"
+    conteudo_txt += f"Texto final:\n{texto_final}\n"
+
+    st.session_state["respondido"] = True
+    st.session_state["df_respostas"] = df
+    st.session_state["txt_respostas"] = conteudo_txt
+
+# ---------- STATUS E VISUALIZAÇÃO ----------
+if st.session_state["respondido"]:
+    st.success("Status: respondido")
+
+    st.markdown("### 📊 Visualização das respostas")
+    st.dataframe(
+        st.session_state["df_respostas"][["Aluno(a)", "Questão", "Resposta"]],
+        use_container_width=True
+    )
+
+    st.download_button(
+        label="Baixar bloco de notas",
+        data=st.session_state["txt_respostas"],
+        file_name=f"respostas_{nome_aluno.replace(' ', '_')}.txt" if nome_aluno else "respostas.txt",
+        mime="text/plain"
+    )
