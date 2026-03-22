@@ -7,18 +7,6 @@ st.markdown("""
 <style>
     .main {
         background-color: #f3f4f6;
-    }
-
-    .a4-sheet {
-        background: white;
-        width: 210mm;
-        min-height: 297mm;
-        margin: 20px auto;
-        padding: 25mm 20mm 25mm 20mm;
-        box-shadow: 0 0 10px rgba(0,0,0,0.12);
-        border-radius: 6px;
-        font-family: Arial, sans-serif;
-    }
 
     .titulo-disciplina {
         text-align: center;
