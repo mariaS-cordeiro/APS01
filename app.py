@@ -23,7 +23,7 @@ st.markdown(
 st.divider()
 
 # ---------- IDENTIFICAÇÃO ----------
-nome_aluno = st.text_input("Nome do(a) aluno(a):")
+nome_aluno = st.text_input("Nome dos(a) alunos(a):")
 
 st.divider()
 
