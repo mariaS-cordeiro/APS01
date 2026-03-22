@@ -10,10 +10,19 @@ def contar_palavras(texto):
 # ---------- CABEÇALHO CENTRALIZADO ----------
 st.markdown("""
 <div style='text-align: center;'>
-    <h1>Metodologia do Estudo</h1>
-    <h3>APS - Ciência e Fake News</h3>
-    <p><b>Profa. Maria Sirleidy Cordeiro</b></p>
-    <p>marias.cordeiro@ufpe.br</p>
+
+    <h1 style='color: black;'>Metodologia do Estudo</h1>
+
+    <h3 style='color: #ff6600;'>APS - Ciência e Fake News</h3>
+
+    <p style='color: black; font-weight: bold;'>
+        Profa. Maria Sirleidy Cordeiro
+    </p>
+
+    <p style='color: #ff6600;'>
+        marias.cordeiro@ufpe.br
+    </p>
+
 </div>
 """, unsafe_allow_html=True)
 
