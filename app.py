@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 
 st.set_page_config(page_title="APS - Ciência e Fake News", layout="centered")
 
@@ -16,8 +17,8 @@ def resumir_texto(texto, limite=80):
 if "respondido" not in st.session_state:
     st.session_state["respondido"] = False
 
-if "df_respostas" not in st.session_state:
-    st.session_state["df_respostas"] = None
+if "df_visualizacao" not in st.session_state:
+    st.session_state["df_visualizacao"] = None
 
 if "txt_respostas" not in st.session_state:
     st.session_state["txt_respostas"] = ""
@@ -107,24 +108,57 @@ st.divider()
 
 # ---------- SALVAR ----------
 if st.button("Salvar respostas"):
-    dados = {
-        "Aluno(a)": [nome_aluno] * 8,
-        "Questão": ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Texto final"],
-        "Resposta completa": respostas + [texto_final]
-    }
+    if not nome_aluno.strip():
+        st.error("Por favor, preencha o nome do(a) aluno(a).")
+    elif any(contar_palavras(r) > 100 for r in respostas) or contar_palavras(texto_final) > 200:
+        st.error("Há respostas acima do limite de palavras. Revise antes de salvar.")
+    else:
+        nova_linha = {
+            "Aluno(a)": nome_aluno,
+            "Q1": respostas[0],
+            "Q2": respostas[1],
+            "Q3": respostas[2],
+            "Q4": respostas[3],
+            "Q5": respostas[4],
+            "Q6": respostas[5],
+            "Q7": respostas[6],
+            "Texto final": texto_final
+        }
 
-    df = pd.DataFrame(dados)
-    df["Resposta"] = df["Resposta completa"].apply(lambda x: resumir_texto(x, 80))
+        arquivo_csv = "respostas.csv"
 
-    # conteúdo para download em txt
-    conteudo_txt = f"Aluno(a): {nome_aluno}\n\n"
-    for i, r in enumerate(respostas, start=1):
-        conteudo_txt += f"Q{i}:\n{r}\n\n"
-    conteudo_txt += f"Texto final:\n{texto_final}\n"
+        if os.path.exists(arquivo_csv):
+            df_existente = pd.read_csv(arquivo_csv)
+            df_todas = pd.concat([df_existente, pd.DataFrame([nova_linha])], ignore_index=True)
+        else:
+            df_todas = pd.DataFrame([nova_linha])
 
-    st.session_state["respondido"] = True
-    st.session_state["df_respostas"] = df
-    st.session_state["txt_respostas"] = conteudo_txt
+        df_todas.to_csv(arquivo_csv, index=False)
+
+        # tabela resumida para visualização
+        df_visual = pd.DataFrame({
+            "Aluno(a)": [nome_aluno] * 8,
+            "Questão": ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Texto final"],
+            "Resposta": [
+                resumir_texto(respostas[0]),
+                resumir_texto(respostas[1]),
+                resumir_texto(respostas[2]),
+                resumir_texto(respostas[3]),
+                resumir_texto(respostas[4]),
+                resumir_texto(respostas[5]),
+                resumir_texto(respostas[6]),
+                resumir_texto(texto_final)
+            ]
+        })
+
+        conteudo_txt = f"Aluno(a): {nome_aluno}\n\n"
+        for i, r in enumerate(respostas, start=1):
+            conteudo_txt += f"Q{i}:\n{r}\n\n"
+        conteudo_txt += f"Texto final:\n{texto_final}\n"
+
+        st.session_state["respondido"] = True
+        st.session_state["df_visualizacao"] = df_visual
+        st.session_state["txt_respostas"] = conteudo_txt
 
 # ---------- STATUS E VISUALIZAÇÃO ----------
 if st.session_state["respondido"]:
@@ -132,7 +166,7 @@ if st.session_state["respondido"]:
 
     st.markdown("### 📊 Visualização das respostas")
     st.dataframe(
-        st.session_state["df_respostas"][["Aluno(a)", "Questão", "Resposta"]],
+        st.session_state["df_visualizacao"],
         use_container_width=True
     )
 
@@ -142,3 +176,13 @@ if st.session_state["respondido"]:
         file_name=f"respostas_{nome_aluno.replace(' ', '_')}.txt" if nome_aluno else "respostas.txt",
         mime="text/plain"
     )
+
+# ---------- DOWNLOAD DO CSV GERAL ----------
+if os.path.exists("respostas.csv"):
+    with open("respostas.csv", "rb") as f:
+        st.download_button(
+            label="Baixar planilha geral (CSV)",
+            data=f,
+            file_name="respostas.csv",
+            mime="text/csv"
+        )
