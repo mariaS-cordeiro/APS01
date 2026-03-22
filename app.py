@@ -5,26 +5,20 @@ st.set_page_config(page_title="APS - Ciência e Fake News", layout="centered")
 
 # ---------- FUNÇÃO ----------
 def contar_palavras(texto):
-    return len(texto.split()) if texto.strip() else 0
+    return len(texto.split()) if texto and texto.strip() else 0
 
-# ---------- CABEÇALHO CENTRALIZADO ----------
-st.markdown("""
-<div style='text-align: center;'>
-
-    <h1 style='color: black;'>Metodologia do Estudo</h1>
-
-    <h3 style='color: #ff6600;'>APS - Ciência e Fake News</h3>
-
-    <p style='color: black; font-weight: bold;'>
-        Profa. Maria Sirleidy Cordeiro
-    </p>
-
-    <p style='color: #ff6600;'>
-        marias.cordeiro@ufpe.br
-    </p>
-
-</div>
-""", unsafe_allow_html=True)
+# ---------- CABEÇALHO ----------
+st.markdown(
+    """
+    <div style='text-align: center;'>
+        <h1 style='color: black; margin-bottom: 0;'>Metodologia do Estudo</h1>
+        <h3 style='color: #e65100; margin-top: 8px;'>APS - Ciência e Fake News</h3>
+        <p style='color: black; font-weight: bold; margin-bottom: 0;'>Profa. Maria Sirleidy Cordeiro</p>
+        <p style='color: #e65100; margin-top: 4px;'>marias.cordeiro@ufpe.br</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.divider()
 
@@ -34,7 +28,7 @@ nome_aluno = st.text_input("Nome do(a) aluno(a):")
 st.divider()
 
 # ---------- INSTRUÇÕES ----------
-st.markdown("### 📝 Produção escrita")
+st.markdown("### ✏️ Produção escrita")
 st.write("Responda às questões das páginas 58–59 de Vieira e Faraco (2019).")
 
 perguntas_100 = [
@@ -53,7 +47,7 @@ respostas = []
 for i, pergunta in enumerate(perguntas_100, start=1):
     st.markdown(f"**{pergunta}**")
     resposta = st.text_area(
-        f"Resposta {i}",
+        label=f"Resposta da questão {i}",
         height=120,
         key=f"q_{i}",
         label_visibility="collapsed"
@@ -69,8 +63,7 @@ for i, pergunta in enumerate(perguntas_100, start=1):
     st.divider()
 
 # ---------- TEXTO FINAL ----------
-st.markdown("### 📌 Consolidando os estudos")
-
+st.markdown("### ✏️ Produção escrita final")
 st.write(
     "A partir das discussões de Lungarzo (1993) e Chalmers (1993) sobre o que é ciência, "
     "elabore um texto dissertativo de até 200 palavras, explicando de que forma a ciência "
@@ -100,8 +93,8 @@ st.divider()
 # ---------- SALVAR ----------
 if st.button("Salvar respostas"):
     dados = {
-        "Aluno(a)": [nome_aluno]*8,
-        "Questão": ["Q1","Q2","Q3","Q4","Q5","Q6","Q7","Texto final"],
+        "Aluno(a)": [nome_aluno] * 8,
+        "Questão": ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Texto final"],
         "Resposta": respostas + [texto_final]
     }
 
