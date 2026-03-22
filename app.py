@@ -25,7 +25,7 @@ nome_aluno = st.text_input("Nome do(a) aluno(a):")
 st.divider()
 
 # ---------- INSTRUÇÕES ----------
-st.markdown("### ✏️ Produção escrita")
+st.markdown("### 📝 Produção escrita")
 st.write("Responda às questões das páginas 58–59 de Vieira e Faraco (2019).")
 
 perguntas_100 = [
@@ -60,7 +60,7 @@ for i, pergunta in enumerate(perguntas_100, start=1):
     st.divider()
 
 # ---------- TEXTO FINAL ----------
-st.markdown("### ✏️ Produção escrita final")
+st.markdown("### 📌 Consolidando os estudos")
 
 st.write(
     "A partir das discussões de Lungarzo (1993) e Chalmers (1993) sobre o que é ciência, "
