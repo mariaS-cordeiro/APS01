@@ -1,149 +1,88 @@
 import streamlit as st
+import pandas as pd
 
 st.set_page_config(page_title="APS - Ciência e Fake News", layout="centered")
 
-# ---------- ESTILO ----------
-st.markdown("""
-<style>
-    .main {
-        background-color: #f3f4f6;
-
-    .titulo-disciplina {
-        text-align: center;
-        font-size: 26px;
-        font-weight: 700;
-        margin-bottom: 6px;
-    }
-
-    .subinfo {
-        text-align: center;
-        font-size: 15px;
-        margin-bottom: 2px;
-    }
-
-    .secao {
-        font-size: 22px;
-        font-weight: 700;
-        margin-top: 24px;
-        margin-bottom: 18px;
-    }
-
-    .instrucao {
-        font-size: 16px;
-        font-weight: 600;
-        margin-top: 18px;
-        margin-bottom: 8px;
-    }
-
-    .questao {
-        font-size: 16px;
-        margin-top: 12px;
-        margin-bottom: 8px;
-        line-height: 1.5;
-    }
-
-    .destaque {
-        font-weight: 700;
-    }
-
-    .caixa-label {
-        font-size: 13px;
-        color: #555;
-        margin-top: -6px;
-        margin-bottom: 8px;
-    }
-
-    hr {
-        margin-top: 28px;
-        margin-bottom: 28px;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # ---------- FUNÇÃO ----------
-def contar_palavras(texto: str) -> int:
+def contar_palavras(texto):
     return len(texto.split()) if texto.strip() else 0
 
-# ---------- CONTAINER A4 ----------
-st.markdown('<div class="a4-sheet">', unsafe_allow_html=True)
+# ---------- CABEÇALHO COM LOGO ----------
+col1, col2 = st.columns([1, 3])
 
-st.markdown('<div class="titulo-disciplina">Metodologia do estudo</div>', unsafe_allow_html=True)
-st.markdown('<div class="subinfo">Profa. Maria Sirleidy Cordeiro</div>', unsafe_allow_html=True)
-st.markdown('<div class="subinfo">marias.cordeiro@ufpe.br</div>', unsafe_allow_html=True)
+with col1:
+    st.image("logo.png", width=120)  # coloque a imagem no GitHub com esse nome
 
-st.markdown('<div class="secao">📝 Produção escrita</div>', unsafe_allow_html=True)
+with col2:
+    st.title("Metodologia do Estudo")
+    st.subheader("APS - Ciência e Fake News")
+    st.write("Profa. Maria Sirleidy Cordeiro")
+    st.write("marias.cordeiro@ufpe.br")
 
-st.markdown(
-    '<div class="instrucao">📌 Responda às questões das páginas 58–59 de Vieira e Faraco (2019).</div>',
-    unsafe_allow_html=True
-)
+st.divider()
+
+# ---------- IDENTIFICAÇÃO ----------
+nome_aluno = st.text_input("Nome do(a) aluno(a):")
+
+st.divider()
+
+# ---------- INSTRUÇÕES ----------
+st.markdown("### 📌 Produção escrita")
+st.write("Responda às questões das páginas 58–59 de Vieira e Faraco (2019).")
 
 perguntas_100 = [
-    '(1) Como o entrevistado explica o surgimento do termo “pós-verdade”?',
-    '(2) Segundo ele, devemos checar tudo o que lemos. Que procedimento ele sugere para isso?',
-    '(3) Que recomendações ele dá aos leitores para evitar a propagação de notícias falsas?',
-    '(4) Por que é relevante ter cuidado em não repassar notícias falsas?',
-    '(5a) “O fato de existir um termo como pós-verdade mostra que estamos com dificuldade de entender e contextualizar os acontecimentos.” À que acontecimentos ele está se referindo?',
-    '(5b) “Preste atenção também ao uso de adjetivos.” Por que ele faz essa recomendação?',
-    '(5c) “Muitas vezes a certeza das pessoas não se baseia em fatos.” Qual a consequência disso para nós, leitores?'
+    "1. Como o entrevistado explica o surgimento do termo “pós-verdade”?",
+    "2. Segundo ele, devemos checar tudo o que lemos. Que procedimento ele sugere para isso?",
+    "3. Que recomendações ele dá aos leitores para evitar a propagação de notícias falsas?",
+    "4. Por que é relevante ter cuidado em não repassar notícias falsas?",
+    "5. O fato de existir um termo como pós-verdade mostra dificuldade de contextualização. A que acontecimentos ele se refere?",
+    "6. Por que é importante prestar atenção ao uso de adjetivos?",
+    "7. Qual a consequência de crenças não baseadas em fatos para os leitores?"
 ]
 
-respostas_100 = {}
+respostas = []
 
+# ---------- QUESTÕES ----------
 for i, pergunta in enumerate(perguntas_100, start=1):
-    st.markdown(f'<div class="questao">{pergunta}</div>', unsafe_allow_html=True)
+    st.markdown(f"**{pergunta}**")
     resposta = st.text_area(
-        label=f"Resposta {i}",
+        f"Resposta {i}",
         height=120,
-        key=f"q100_{i}",
-        label_visibility="collapsed",
-        placeholder="Escreva sua resposta aqui..."
+        key=f"q_{i}",
+        label_visibility="collapsed"
     )
+
     total = contar_palavras(resposta)
-    respostas_100[f"q{i}"] = resposta
+    st.caption(f"Palavras: {total}/100")
 
-    if total <= 100:
-        st.markdown(f'<div class="caixa-label">Palavras: {total}/100</div>', unsafe_allow_html=True)
-    else:
-        st.error(f"Você ultrapassou o limite de 100 palavras. Total atual: {total}")
+    if total > 100:
+        st.error("Limite de 100 palavras excedido.")
 
-st.markdown("<hr>", unsafe_allow_html=True)
+    respostas.append(resposta)
+    st.divider()
 
-st.markdown(
-    '<div class="instrucao">📌 A partir das discussões de Lungarzo (1993) e Chalmers (1993) sobre o que é ciência, elabore um texto dissertativo de até 200 palavras, explicando de que forma a ciência pode ser afetada ou prejudicada pela disseminação de fake news, com base no texto de Vieira e Faraco (2019, p. 50–63).</div>',
-    unsafe_allow_html=True
-)
+# ---------- TEXTO FINAL ----------
+st.markdown("### ✍️ Produção escrita final")
 
-st.markdown("""
-<div class="questao">
-<span class="destaque">Para a construção da resposta, considere:</span><br>
-• o conceito de ciência apresentado pelos autores Lungarzo (1993) e Chalmers (1993);<br>
-• a relação entre conhecimento científico, validação e verdade;<br>
-• os impactos das fake news na credibilidade e circulação do conhecimento científico.
-</div>
-""", unsafe_allow_html=True)
-
-texto_final = st.text_area(
-    "Texto final",
-    height=220,
-    key="texto_200",
-    label_visibility="collapsed",
-    placeholder="Escreva seu texto dissertativo aqui..."
-)
+texto_final = st.text_area("Texto final (até 200 palavras)", height=220)
 
 total_final = contar_palavras(texto_final)
+st.caption(f"Palavras: {total_final}/200")
 
-if total_final <= 200:
-    st.markdown(f'<div class="caixa-label">Palavras: {total_final}/200</div>', unsafe_allow_html=True)
-else:
-    st.error(f"Você ultrapassou o limite de 200 palavras. Total atual: {total_final}")
+if total_final > 200:
+    st.error("Limite de 200 palavras excedido.")
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.divider()
 
+# ---------- SALVAR ----------
 if st.button("Salvar respostas"):
-    st.success("Respostas registradas na sessão.")
-    st.write("Pré-visualização:")
-    st.write(respostas_100)
-    st.write({"texto_final": texto_final})
+    dados = {
+        "Aluno(a)": [nome_aluno]*8,
+        "Questão": ["Q1","Q2","Q3","Q4","Q5","Q6","Q7","Texto final"],
+        "Resposta": respostas + [texto_final]
+    }
 
-st.markdown("</div>", unsafe_allow_html=True)
+    df = pd.DataFrame(dados)
+
+    st.success("Respostas registradas!")
+    st.dataframe(df, use_container_width=True)
